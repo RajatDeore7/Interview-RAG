@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+
+# Environments
+.venv/
+env/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# FAISS index files
+faiss_index/
+*.faiss
+*.pkl
+
+# Upload temp files
+temp_resumes/
+temp_*.pdf
+.env

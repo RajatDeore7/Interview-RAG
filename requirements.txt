@@ -1,0 +1,23 @@
+fastapi
+uvicorn
+python-multipart
+pydantic
+python-dotenv
+boto3
+shutil
+
+# LangChain & LLMs
+langchain
+langchain-community
+langchain-google-genai
+langchain_groq
+langchain-huggingface
+
+# PDF and Vector Tools
+PyMuPDF            # Fast PDF parsing (instead of PyPDF2)
+pypdf
+faiss-cpu          # For vectorstore
+sentence-transformers
+
+# Optional but useful
+requests

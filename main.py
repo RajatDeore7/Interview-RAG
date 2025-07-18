@@ -13,6 +13,7 @@ from RAG import (
     chat_with_interviewer,
 )
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 load_dotenv()
@@ -21,6 +22,15 @@ API_KEY = os.getenv("API_KEY")
 API_KEY_Credits = {}
 
 vectorstore = None
+
+# Middleware to handle CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def check_api_key(

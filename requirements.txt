@@ -4,7 +4,6 @@ python-multipart
 pydantic
 python-dotenv
 boto3
-shutil
 
 # LangChain & LLMs
 langchain

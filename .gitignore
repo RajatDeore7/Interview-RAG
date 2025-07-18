@@ -21,4 +21,3 @@ faiss_index/
 # Upload temp files
 temp_resumes/
 temp_*.pdf
-.env

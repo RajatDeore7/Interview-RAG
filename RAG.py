@@ -156,7 +156,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key=os.getenv("GROQ_KEY"),
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -170,8 +170,9 @@ def initialize_interview(vstore, job_context: dict, history=None):
 
 
 # Chat with the interviewer
-def chat_with_interviewer(user_input, job_context, history):
+def chat_with_interviewer(user_input, job_context, vstore, history):
     global vectorstore
+    vectorstore = vstore
 
     resume_reference = get_resume_context(vectorstore, user_input, k=3)
 
@@ -207,7 +208,7 @@ def chat_with_interviewer(user_input, job_context, history):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key=os.getenv("GROQ_KEY"),
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )

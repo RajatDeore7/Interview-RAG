@@ -25,6 +25,7 @@ API_KEY = os.getenv("API_KEY")
 # In-memory storage for demo
 USER_CREDITS = {}  # user_id -> credits
 USER_VECTORSTORE = {}  # user_id -> vectorstore
+USER_HISTORY = {}
 
 # Logger
 logging.basicConfig(level=logging.INFO)
@@ -134,7 +135,11 @@ async def start_interview_api(job: JobContext, user_id: str = Depends(check_user
     # Try LLM call and rollback credits on failure
     before = USER_CREDITS[user_id]
     try:
-        question = initialize_interview(vectorstore, job.dict())
+        history = []
+        question, history = initialize_interview(
+            vectorstore, job.dict(), history=history
+        )
+        USER_HISTORY[user_id] = history
     except Exception as e:
         USER_CREDITS[user_id] = before
         logger.exception(f"Error starting interview for user {user_id}")
@@ -156,5 +161,9 @@ async def chat_with_bot(
         vectorstore = load_index()
         USER_VECTORSTORE[user_id] = vectorstore
 
-    response = chat_with_interviewer(reply.user_input, job.dict())
+    history = USER_HISTORY.get(user_id, [])
+    response, history = chat_with_interviewer(
+        reply.user_input, job.dict(), vectorstore, history
+    )
+    USER_HISTORY[user_id] = history
     return {"interviewer": response, "remaining_credits": USER_CREDITS[user_id]}

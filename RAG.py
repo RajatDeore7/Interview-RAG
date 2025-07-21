@@ -14,7 +14,6 @@ from langchain_groq import ChatGroq
 # from langchain_ollama import OllamaLLM
 
 # Globals for simple session
-message_history = []
 vectorstore = None
 load_dotenv()
 
@@ -109,10 +108,13 @@ def get_resume_context(vectorstore, query="candidate introduction", k=5):
 
 
 # Start the interview
-def initialize_interview(vstore, job_context: dict):
-    global message_history, vectorstore
+def initialize_interview(vstore, job_context: dict, history=None):
+
+    if history is None:
+        history = []
+
+    global vectorstore
     vectorstore = vstore
-    message_history = []
 
     resume_context = get_resume_context(vectorstore, "candidate introduction")
 
@@ -160,16 +162,16 @@ def initialize_interview(vstore, job_context: dict):
     )
     ai_reply = llm.invoke(full_prompt)
 
-    message_history.append({"role": "system", "content": system_prompt})
-    message_history.append({"role": "user", "content": user_prompt})
-    message_history.append({"role": "assistant", "content": ai_reply})
+    history.append({"role": "system", "content": system_prompt})
+    history.append({"role": "user", "content": user_prompt})
+    history.append({"role": "assistant", "content": ai_reply})
 
-    return ai_reply
+    return ai_reply, history
 
 
 # Chat with the interviewer
-def chat_with_interviewer(user_input, job_context):
-    global message_history, vectorstore
+def chat_with_interviewer(user_input, job_context, history):
+    global vectorstore
 
     resume_reference = get_resume_context(vectorstore, user_input, k=3)
 
@@ -183,11 +185,12 @@ def chat_with_interviewer(user_input, job_context):
     )
 
     # Append user message
-    message_history.append({"role": "user", "content": user_input})
+    history = list(history)  # shallow copy if you prefer
+    history.append({"role": "user", "content": user_input})
 
     # Prepare full conversation context
     conversation = ""
-    for msg in message_history:
+    for msg in history:
         conversation += f"{msg['role'].capitalize()}: {msg['content']}\n"
 
     # Compose full prompt
@@ -211,6 +214,6 @@ def chat_with_interviewer(user_input, job_context):
     ai_reply = llm.invoke(full_prompt)
 
     # Save assistant reply
-    message_history.append({"role": "assistant", "content": ai_reply})
+    history.append({"role": "assistant", "content": ai_reply})
 
-    return ai_reply
+    return ai_reply, history

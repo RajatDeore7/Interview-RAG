@@ -195,12 +195,28 @@ def chat_with_interviewer(user_input, job_context, vstore, history):
         conversation += f"{msg['role'].capitalize()}: {msg['content']}\n"
 
     # Compose full prompt
-    full_prompt = (
-        f"{conversation}\n\n"
-        f"(Additional Context)\nJob Info:\n{job_context_str}\n"
-        f"Relevant Resume Info:\n{resume_reference}\n"
-        "Ask the next short, relevant question based on this conversation. Do not repeat previous questions."
-    )
+    full_prompt = f"""
+            You are a professional interviewer for the role described below.
+            Job Info:
+            {job_context_str}
+
+            Relevant Resume Info:
+            {resume_reference}
+
+            Conversation so far:
+            {conversation}
+
+            Your task:
+            1. If the candidate wants to end the interview (mentions "stop", "end", or "quit"), respond politely and conclude.
+            2. Otherwise, ask the next relevant question.
+            3. If the candidate's last answer was short, vague, or only yes/no, follow up with a deeper question, 
+            asking for examples, projects, or real-world applications.
+            4. Avoid repeating previous questions.
+            5. Keep questions concise and clear.
+            6. Always ask only ONE question at a time.
+            7. If the candidate's last answer was good, acknowledge it and ask a follow-up question.
+            8. If the candidate's last answer was not good, ask a more specific question to clarify.
+        """
 
     # llm = OllamaLLM(model="llama3")
     # llm = ChatGoogleGenerativeAI(

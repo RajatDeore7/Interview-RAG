@@ -156,7 +156,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -170,7 +170,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
 
 
 # Chat with the interviewer
-def chat_with_interviewer(user_input, job_context, vstore, history):
+def chat_with_interviewer(user_input, job_context, vstore, history, phase="resume"):
     global vectorstore
     vectorstore = vstore
 
@@ -185,8 +185,33 @@ def chat_with_interviewer(user_input, job_context, vstore, history):
         f"Years of Experience: {job_context.get('years_of_experience')}"
     )
 
+    # Phase-specific instruction
+    if phase == "wrapup":
+        phase_instruction = """
+        You're in the wrap-up phase of the interview.
+        Politely thank the candidate, ask if they have any questions, and prepare to close the interview.
+        """
+    elif phase == "behavioral":
+        phase_instruction = """
+        You're in the behavioral round now.
+        Ask questions that explore the candidate's past experiences, teamwork, conflict resolution, strengths, and weaknesses.
+        Avoid technical topics. Focus on behavior, values, and personality.
+        """
+    elif phase == "role based technical":
+        phase_instruction = """
+        You're in the technical round.
+        Ask deep technical questions based on the job role, required skills, and years of experience.
+        Refer to candidate's resume for context, and probe real-world understanding.
+        """
+    else:
+        phase_instruction = """
+        You're in the resume-based round.
+        Ask questions related to the candidate's resume—projects, education, work experience.
+        Get to know their background and key achievements.
+        """
+
     # Append user message
-    history = list(history)  # shallow copy if you prefer
+    history = list(history)  # shallow copy
     history.append({"role": "user", "content": user_input})
 
     # Prepare full conversation context
@@ -196,27 +221,31 @@ def chat_with_interviewer(user_input, job_context, vstore, history):
 
     # Compose full prompt
     full_prompt = f"""
-            You are a professional interviewer for the role described below.
-            Job Info:
-            {job_context_str}
+        You are a professional interviewer for the role described below.
 
-            Relevant Resume Info:
-            {resume_reference}
+        Job Info:
+        {job_context_str}
 
-            Conversation so far:
-            {conversation}
+        Relevant Resume Info:
+        {resume_reference}
 
-            Your task:
-            1. If the candidate wants to end the interview (mentions "stop", "end", or "quit"), respond politely and conclude.
-            2. Otherwise, ask the next relevant question.
-            3. If the candidate's last answer was short, vague, or only yes/no, follow up with a deeper question, 
-            asking for examples, projects, or real-world applications.
-            4. Avoid repeating previous questions.
-            5. Keep questions concise and clear.
-            6. Always ask only ONE question at a time.
-            7. If the candidate's last answer was good, acknowledge it and ask a follow-up question.
-            8. If the candidate's last answer was not good, ask a more specific question to clarify.
-        """
+        Interview Phase Instructions:
+        {phase_instruction}
+
+        Conversation so far:
+        {conversation}
+
+        Your task:
+        1. If the candidate wants to end the interview (mentions "stop", "end", or "quit"), respond politely and conclude.
+        2. Otherwise, ask the next relevant question.
+        3. If the candidate's last answer was short, vague, or only yes/no, follow up with a deeper question, 
+           asking for examples, projects, or real-world applications.
+        4. Avoid repeating previous questions.
+        5. Keep questions concise and clear.
+        6. Always ask only ONE question at a time.
+        7. If the candidate's last answer was good, acknowledge it and ask a follow-up question.
+        8. If the candidate's last answer was not good, ask a more specific question to clarify.
+    """
 
     # llm = OllamaLLM(model="llama3")
     # llm = ChatGoogleGenerativeAI(
@@ -224,7 +253,7 @@ def chat_with_interviewer(user_input, job_context, vstore, history):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )

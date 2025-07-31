@@ -15,6 +15,7 @@ from RAG import (
     initialize_interview,
     chat_with_interviewer,
 )
+from interview_manager import InterviewManager
 
 # Load env variables
 load_dotenv()
@@ -26,6 +27,7 @@ API_KEY = os.getenv("API_KEY")
 USER_CREDITS = {}  # user_id -> credits
 USER_VECTORSTORE = {}  # user_id -> vectorstore
 USER_HISTORY = {}
+USER_INTERVIEW_MANAGER = {}
 
 # Logger
 logging.basicConfig(level=logging.INFO)
@@ -140,6 +142,7 @@ async def start_interview_api(job: JobContext, user_id: str = Depends(check_user
             vectorstore, job.dict(), history=history
         )
         USER_HISTORY[user_id] = history
+        USER_INTERVIEW_MANAGER[user_id] = InterviewManager()
     except Exception as e:
         USER_CREDITS[user_id] = before
         logger.exception(f"Error starting interview for user {user_id}")
@@ -162,8 +165,19 @@ async def chat_with_bot(
         USER_VECTORSTORE[user_id] = vectorstore
 
     history = USER_HISTORY.get(user_id, [])
+
+    interview_manager = USER_INTERVIEW_MANAGER.get(user_id)
+    current_phase = "resume"
+    if interview_manager:
+        current_phase = interview_manager.get_current_phase()
+
     response, history = chat_with_interviewer(
-        reply.user_input, job.dict(), vectorstore, history
+        reply.user_input, job.dict(), vectorstore, history, phase=current_phase
     )
+
     USER_HISTORY[user_id] = history
-    return {"interviewer": response, "remaining_credits": USER_CREDITS[user_id]}
+    return {
+        "interviewer": response,
+        "phase": current_phase,
+        "remaining_credits": USER_CREDITS[user_id],
+    }

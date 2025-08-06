@@ -270,7 +270,6 @@ def chat_with_interviewer(
     if phase == "wrapup":
         interview_data = {
             "job_context": job_context,
-            "resume_reference": resume_reference,
             "conversation_history": history,
             "timestamp": datetime.utcnow().isoformat(),
         }

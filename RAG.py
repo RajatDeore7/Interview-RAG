@@ -1,6 +1,5 @@
 import os
 import tempfile
-import shutil
 import boto3 as b3
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
@@ -8,6 +7,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
+from datetime import datetime
+from utils import store_interview_to_s3
 
 # from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -156,7 +157,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -170,7 +171,9 @@ def initialize_interview(vstore, job_context: dict, history=None):
 
 
 # Chat with the interviewer
-def chat_with_interviewer(user_input, job_context, vstore, history, phase="resume"):
+def chat_with_interviewer(
+    user_input, job_context, vstore, history, userid, phase="resume"
+):
     global vectorstore
     vectorstore = vstore
 
@@ -194,7 +197,7 @@ def chat_with_interviewer(user_input, job_context, vstore, history, phase="resum
     elif phase == "behavioral":
         phase_instruction = """
         You're in the behavioral round now.
-        Ask questions that explore the candidate's past experiences, teamwork, conflict resolution, strengths, and weaknesses.
+        Ask questions that explore the candidate's teamwork, conflict resolution, strengths, and weaknesses.
         Avoid technical topics. Focus on behavior, values, and personality.
         """
     elif phase == "role based technical":
@@ -245,6 +248,7 @@ def chat_with_interviewer(user_input, job_context, vstore, history, phase="resum
         6. Always ask only ONE question at a time.
         7. If the candidate's last answer was good, acknowledge it and ask a follow-up question.
         8. If the candidate's last answer was not good, ask a more specific question to clarify.
+        9. If the candidate ask to repeat the question, so repeat the last question.
     """
 
     # llm = OllamaLLM(model="llama3")
@@ -253,7 +257,7 @@ def chat_with_interviewer(user_input, job_context, vstore, history, phase="resum
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -261,5 +265,15 @@ def chat_with_interviewer(user_input, job_context, vstore, history, phase="resum
 
     # Save assistant reply
     history.append({"role": "assistant", "content": ai_reply})
+
+    # Store interview data to S3 after phase wrap-up
+    if phase == "wrapup":
+        interview_data = {
+            "job_context": job_context,
+            "resume_reference": resume_reference,
+            "conversation_history": history,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+        store_interview_to_s3(userid, interview_data)
 
     return ai_reply, history

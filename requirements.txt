@@ -4,6 +4,7 @@ python-multipart
 pydantic
 python-dotenv
 boto3
+datetime
 
 # LangChain & LLMs
 langchain

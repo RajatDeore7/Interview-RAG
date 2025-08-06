@@ -9,7 +9,7 @@ datetime
 # LangChain & LLMs
 langchain
 langchain-community
-langchain-google-genai
+# langchain-google-genai
 langchain_groq
 langchain-huggingface
 

@@ -30,7 +30,7 @@ def store_interview_to_s3(user_id, interview_data):
     existing_data.append(interview_data)
 
     s3.put_object(
-        Bucket=S3_BUCKET_NAME,
+        Bucket=bucket_name,
         Key=s3_key,
         Body=json.dumps(existing_data, indent=2),
         ContentType="application/json",

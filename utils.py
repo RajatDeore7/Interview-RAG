@@ -2,6 +2,7 @@ import boto3
 import json
 import os
 from datetime import datetime
+from langchain.schema import AIMessage, HumanMessage
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -15,6 +16,18 @@ s3 = boto3.client(
 )
 
 bucket_name = os.getenv("S3_BUCKET_NAME")
+
+
+def serialize_chat_history(data):
+    serialized = []
+    for entry in data:
+        if isinstance(entry, AIMessage):
+            serialized.append({"type": "ai", "text": entry.content})
+        elif isinstance(entry, HumanMessage):
+            serialized.append({"type": "human", "text": entry.content})
+        else:
+            serialized.append({"type": "unknown", "text": str(entry)})
+    return serialized
 
 
 def store_interview_to_s3(user_id, interview_data):
@@ -32,6 +45,6 @@ def store_interview_to_s3(user_id, interview_data):
     s3.put_object(
         Bucket=bucket_name,
         Key=s3_key,
-        Body=json.dumps(existing_data, indent=2),
+        Body=json.dumps(serialize_chat_history(existing_data), indent=2),
         ContentType="application/json",
     )

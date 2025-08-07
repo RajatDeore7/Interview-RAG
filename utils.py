@@ -1,6 +1,7 @@
 import boto3
 import json
 import os
+import uuid
 from datetime import datetime
 from langchain.schema import AIMessage, HumanMessage
 from dotenv import load_dotenv
@@ -18,6 +19,10 @@ s3 = boto3.client(
 bucket_name = os.getenv("S3_BUCKET_NAME")
 
 
+def normalize_string(s):
+    return s.strip().lower().replace(" ", "_").replace("/", "_")
+
+
 def serialize_chat_history(data):
     serialized = []
     for entry in data:
@@ -31,20 +36,33 @@ def serialize_chat_history(data):
 
 
 def store_interview_to_s3(user_id, interview_data):
-    s3_key = f"interviews/{user_id}.json"
+    # Serialize conversation history
+    if "conversation_history" in interview_data:
+        interview_data["conversation_history"] = serialize_chat_history(
+            interview_data["conversation_history"]
+        )
 
-    try:
-        response = s3.get_object(Bucket=bucket_name, Key=s3_key)
-        existing_data = json.loads(response["Body"].read().decode("utf-8"))
-    except s3.exceptions.NoSuchKey:
-        existing_data = []
+    # Add timestamp
+    timestamp = datetime.utcnow().isoformat()
+    interview_data["timestamp"] = timestamp
 
-    interview_data["timestamp"] = datetime.utcnow().isoformat()
-    existing_data.append(interview_data)
+    # Extract job info
+    job_context = interview_data.get("job_context", {})
+    company = normalize_string(job_context.get("company", "unknown_company"))
+    role = normalize_string(job_context.get("role_title", "unknown_role"))
 
+    # Optional: Add UUID or run id for duplicates
+    run_id = str(uuid.uuid4())[:8]
+
+    # Filename & path
+    filename = f"{timestamp.replace(':', '-')}_{run_id}.json"
+    s3_key = f"interviews/{user_id}/{company}/{role}/{filename}"
+
+    # Upload
     s3.put_object(
         Bucket=bucket_name,
         Key=s3_key,
-        Body=json.dumps(serialize_chat_history(existing_data), indent=2),
+        Body=json.dumps(interview_data, indent=2),
         ContentType="application/json",
     )
+    print(f"✅ Saved interview to S3: s3://{bucket_name}/{s3_key}")

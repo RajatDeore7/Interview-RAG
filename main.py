@@ -2,6 +2,9 @@ import os
 import uuid
 import shutil
 import logging
+import boto3
+import json
+from datetime import datetime
 from fastapi import FastAPI, HTTPException, Header, Depends, UploadFile, File
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -16,10 +19,21 @@ from RAG import (
     chat_with_interviewer,
 )
 from interview_manager import InterviewManager
+from report import evaluate_interview_transcript
 
 # Load env variables
 load_dotenv()
 app = FastAPI()
+
+# Initialize S3 client
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_KEY"),
+    region_name="eu-central-1",
+)
+
+bucket_name = os.getenv("S3_BUCKET_NAME")
 
 API_KEY = os.getenv("API_KEY")
 
@@ -62,6 +76,11 @@ def check_user(
         logger.info(f"Initialized credits for {user_id}: {user_credits}")
 
     return user_id
+
+
+# Helper to normalize strings for S3 paths
+def normalize_string(s):
+    return s.strip().lower().replace(" ", "_").replace("/", "_")
 
 
 # Helper to consume credits safely
@@ -192,4 +211,38 @@ async def chat_with_bot(
         "interviewer": response,
         "phase": current_phase,
         "remaining_credits": USER_CREDITS[user_id],
+    }
+
+
+@app.post("/evaluateInterview")
+async def evaluate_interview(job: JobContext, user_id: str = Depends(check_user)):
+    company = normalize_string(job.company)
+    role = normalize_string(job.role_title)
+
+    prefix = f"interviews/{user_id}/{company}/{role}/"
+
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+
+    if "Contents" not in response or not response["Contents"]:
+        return {"error": "No interview data found for this job context."}
+
+    latest_file = sorted(
+        response["Contents"], key=lambda x: x["LastModified"], reverse=True
+    )[0]["Key"]
+
+    obj = s3.get_object(Bucket=bucket_name, Key=latest_file)
+    interview_data = json.loads(obj["Body"].read().decode("utf-8"))
+
+    report = evaluate_interview_transcript(interview_data)
+
+    return {
+        "message": "Interview data retrieved successfully",
+        "interview_metadata": {
+            "user_id": user_id,
+            "job_role": job.role_title,
+            "company": job.company,
+            "interview_time": interview_data.get("timestamp", "unknown"),
+        },
+        "report": report,
+        # "interview_data": interview_data,
     }

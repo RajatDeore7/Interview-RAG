@@ -273,6 +273,7 @@ def chat_with_interviewer(
             "conversation_history": history,
             "timestamp": datetime.utcnow().isoformat(),
         }
+        print(f"Storing interview data for user {userid} to S3...")
         store_interview_to_s3(userid, interview_data)
 
     return ai_reply, history

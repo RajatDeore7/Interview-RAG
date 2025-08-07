@@ -11,17 +11,17 @@ class InterviewManager:
 
     def update_phase(self):
         minutes = self.get_elapsed_minutes()
-        if minutes < 3:
+        if minutes < 1:
             self.phase = "resume"
-        elif minutes < 6:
+        elif minutes < 2:
             self.phase = "role based technical"
-        elif minutes < 9:
+        elif minutes < 4:
             self.phase = "behavioral"
         else:
             self.phase = "wrapup"
 
     def is_interview_over(self):
-        return self.get_elapsed_minutes() > 10  # or any limit you want
+        return self.get_elapsed_minutes() > 5  # or any limit you want
 
     def get_current_phase(self):
         self.update_phase()

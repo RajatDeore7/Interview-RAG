@@ -8,6 +8,7 @@ from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from datetime import datetime
+from langchain.schema import AIMessage, HumanMessage
 from utils import store_interview_to_s3
 
 # from langchain_google_genai import ChatGoogleGenerativeAI
@@ -17,6 +18,16 @@ from utils import store_interview_to_s3
 # Globals for simple session
 vectorstore = None
 load_dotenv()
+
+
+# Serialize messages for JSON response
+def serialize_message(msg):
+    if isinstance(msg, AIMessage):
+        return {"type": "ai", "text": msg.content}
+    elif isinstance(msg, HumanMessage):
+        return {"type": "human", "text": msg.content}
+    else:
+        return {"type": "unknown", "text": str(msg)}
 
 
 # Load resume PDF
@@ -273,6 +284,7 @@ def chat_with_interviewer(
             "conversation_history": history,
             "timestamp": datetime.utcnow().isoformat(),
         }
+        interview_data["history"] = [serialize_message(m) for m in history]
         store_interview_to_s3(userid, interview_data)
 
     return ai_reply, history

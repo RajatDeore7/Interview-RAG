@@ -192,6 +192,8 @@ def chat_with_interviewer(
     if phase == "wrapup":
         phase_instruction = """
         You're in the wrap-up phase of the interview.
+        End the interview politely.
+        Thank the candidate for their time.
         Politely thank the candidate, ask if they have any questions, and prepare to close the interview.
         """
     elif phase == "behavioral":
@@ -267,7 +269,7 @@ def chat_with_interviewer(
     history.append({"role": "assistant", "content": ai_reply})
 
     # Store interview data to S3 after phase wrap-up
-    if phase == "wrapup":
+    if phase == "closed":
         interview_data = {
             "job_context": job_context,
             "conversation_history": history,

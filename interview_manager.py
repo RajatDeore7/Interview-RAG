@@ -17,8 +17,10 @@ class InterviewManager:
             self.phase = "role based technical"
         elif minutes < 4:
             self.phase = "behavioral"
-        else:
+        elif minutes < 4.55:
             self.phase = "wrapup"
+        else:
+            self.phase = "closed"
 
     def is_interview_over(self):
         return self.get_elapsed_minutes() > 5  # or any limit you want

@@ -17,14 +17,22 @@ An AI-powered interview simulation app using FastAPI, LangChain, FAISS, HuggingF
 ## 📁 Project Structure
 
 RAG/
-├── Data/ # Optional resume data
-├── faiss_index/ # Stores FAISS vector DB
-├── temp_resumes/ # Uploaded resumes
-├── main.py # FastAPI app with endpoints
-├── RAG.py # RAG logic and Gemini integration
-├── requirements.txt # Python dependencies
-├── .env # Your API keys (never commit this!)
-├── start.sh # Uvicorn start script
+├── 📁 .git/ 🚫 (auto-hidden)
+├── 📁 __pycache__/ 🚫 (auto-hidden)
+├── 📁 faiss_index/ 🚫 (auto-hidden)
+├── 📁 temp_resumes/ 🚫 (auto-hidden)
+├── 📁 venv/ 🚫 (auto-hidden)
+├── 📄 .DS_Store 🚫 (auto-hidden)
+├── 🔒 .env 🚫 (auto-hidden)
+├── 🚫 .gitignore
+├── 🐍 RAG.py
+├── 📖 README.md
+├── 🐍 interview_manager.py
+├── 🐍 main.py
+├── 🐍 report.py
+├── 📄 requirements.txt
+├── 🐚 start.sh
+└── 🐍 utils.py
 
 ---
 

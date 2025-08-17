@@ -157,7 +157,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -191,28 +191,51 @@ def chat_with_interviewer(
     # Phase-specific instruction
     if phase == "wrapup":
         phase_instruction = """
-        You're in the wrap-up phase of the interview.
-        End the interview politely.
-        Thank the candidate for their time.
-        Politely thank the candidate, ask if they have any questions, and prepare to close the interview.
+        You are in the WRAP-UP phase.  
+        Your goal: close the interview politely and professionally.
+
+        Rules:
+        1. Thank the candidate for their time and participation.  
+        2. Offer them the chance to ask questions about the company or role.  
+        3. Provide a warm closing statement, leaving a positive impression.  
+        4. Do not ask new technical, behavioral, or resume-based questions.  
+        5. Keep the tone friendly and conversational.
         """
     elif phase == "behavioral":
         phase_instruction = """
-        You're in the behavioral round now.
-        Ask questions that explore the candidate's teamwork, conflict resolution, strengths, and weaknesses.
-        Avoid technical topics. Focus on behavior, values, and personality.
+        You are in the BEHAVIORAL phase.  
+        Your goal: understand the candidate’s values, personality, and soft skills.
+
+        Rules:
+        1. Ask about teamwork, leadership, communication, handling conflict, and adaptability.  
+        2. Use the STAR method (Situation, Task, Action, Result) as a guide—encourage detailed answers.  
+        3. Avoid technical or resume-only questions in this phase.  
+        4. If an answer is too short, ask for specific examples from work, school, or projects.
         """
     elif phase == "role based technical":
         phase_instruction = """
-        You're in the technical round.
-        Ask deep technical questions based on the job role, required skills, and years of experience.
-        Refer to candidate's resume for context, and probe real-world understanding.
+        You are in the ROLE-BASED TECHNICAL phase.  
+        Your goal: assess the candidate’s technical depth.
+
+        Rules:
+        1. Ask job-specific technical questions based on the provided role, required skills, and experience level.  
+        2. Use real-world, scenario-based questions whenever possible.  
+        3. Probe for problem-solving process, reasoning, and trade-offs—not just definitions.  
+        4. If the candidate’s answer is vague, follow up with a request for concrete examples or code-level explanation.  
+        5. Avoid behavioral or resume-only questions in this phase.
+        6. Ask required skills based questions.
         """
     else:
         phase_instruction = """
-        You're in the resume-based round.
-        Ask questions related to the candidate's resume—projects, education, work experience.
-        Get to know their background and key achievements.
+        You are in the RESUME-BASED phase.  
+        Your goal: explore the candidate’s background in detail.
+
+        Rules:
+        1. Focus only on topics mentioned in the resume (education, projects, internships, certifications, achievements).  
+        2. Ask open-ended questions that require explanations, examples, or stories—not just yes/no answers.  
+        3. Avoid asking technical coding or behavioral questions in this phase.  
+        4. Show curiosity and encourage elaboration (e.g., “Tell me more about…”).  
+        5. Use resume context to create follow-up questions that dig deeper into specific experiences.
         """
 
     # Append user message
@@ -259,7 +282,7 @@ def chat_with_interviewer(
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )

@@ -98,6 +98,7 @@ class JobContext(BaseModel):
     role_description: str
     required_skills: str
     years_of_experience: int
+    interview_timing: int
 
 
 class UserReply(BaseModel):
@@ -161,7 +162,7 @@ async def start_interview_api(job: JobContext, user_id: str = Depends(check_user
             vectorstore, job.dict(), history=history
         )
         USER_HISTORY[user_id] = history
-        USER_INTERVIEW_MANAGER[user_id] = InterviewManager()
+        USER_INTERVIEW_MANAGER[user_id] = InterviewManager(job.interview_timing)
     except Exception as e:
         USER_CREDITS[user_id] = before
         logger.exception(f"Error starting interview for user {user_id}")

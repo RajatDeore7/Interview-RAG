@@ -189,7 +189,7 @@ def chat_with_interviewer(
     )
 
     # Phase-specific instruction
-    if phase == "wrapup" or phase == "closed":
+    if phase == "wrapup":
         phase_instruction = """
         You are in the WRAP-UP phase.  
         Your goal: close the interview politely and professionally.

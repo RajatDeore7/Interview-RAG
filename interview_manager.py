@@ -9,10 +9,10 @@ class InterviewManager:
 
         # Use your original ratios
         self.ratios = {
-            "resume": 0.23,
-            "role based technical": 0.43,
-            "behavioral": 0.23,
-            "wrapup": 0.08
+            "resume": 0.20,
+            "role based technical": 0.40,
+            "behavioral": 0.20,
+            "wrapup": 0.10
         }
 
         # Compute cutoffs based on ratios

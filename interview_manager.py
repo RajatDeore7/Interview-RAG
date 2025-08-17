@@ -9,8 +9,8 @@ class InterviewManager:
 
         # Use your original ratios
         self.ratios = {
-            "resume": 0.20,
-            "role based technical": 0.40,
+            "resume": 0.25,
+            "role based technical": 0.45,
             "behavioral": 0.20,
             "wrapup": 0.10
         }

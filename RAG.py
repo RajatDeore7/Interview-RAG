@@ -18,6 +18,8 @@ from utils import store_interview_to_s3
 vectorstore = None
 load_dotenv()
 
+total_input_tokens = 0
+total_output_tokens = 0
 
 # Load resume PDF
 def load_resume(file_path):
@@ -176,6 +178,7 @@ def chat_with_interviewer(
 ):
     global vectorstore
     vectorstore = vstore
+    global total_input_tokens, total_output_tokens
 
     resume_reference = get_resume_context(vectorstore, user_input, k=3)
 
@@ -287,6 +290,22 @@ def chat_with_interviewer(
         max_tokens=1000,
     )
     ai_reply = llm.invoke(full_prompt)
+    # print(f"AI Reply: {ai_reply}")
+    
+    #get total tokens used
+    if hasattr(ai_reply, "usage_metadata") and ai_reply.usage_metadata:
+        input_tokens = ai_reply.usage_metadata.get("input_tokens", 0)
+        output_tokens = ai_reply.usage_metadata.get("output_tokens", 0)
+        total_tokens = ai_reply.usage_metadata.get("total_tokens", 0)
+    else:
+        token_info = ai_reply.response_metadata.get("token_usage", {})
+        input_tokens = token_info.get("prompt_tokens", 0)
+        output_tokens = token_info.get("completion_tokens", 0)
+        total_tokens = token_info.get("total_tokens", 0)
+        
+    #Count total tokens used
+    total_input_tokens += input_tokens
+    total_output_tokens += output_tokens
 
     # Save assistant reply
     history.append({"role": "assistant", "content": ai_reply})
@@ -297,6 +316,9 @@ def chat_with_interviewer(
             "job_context": job_context,
             "conversation_history": history,
             "timestamp": datetime.utcnow().isoformat(),
+            "input_tokens": total_input_tokens,
+            "output_tokens": total_output_tokens,
+            "total_tokens": total_tokens
         }
         print(f"Storing interview data for user {userid} to S3...")
         store_interview_to_s3(userid, interview_data)

@@ -192,6 +192,14 @@ async def chat_with_bot(
         current_phase = interview_manager.get_current_phase()
 
     if interview_manager.is_interview_over():
+        response, history = chat_with_interviewer(
+            reply.user_input,
+            job.dict(),
+            vectorstore,
+            history,
+            userid=user_id,
+            phase= "closed",
+        )
         return {
             "interviewer": "Interview is over. Thank you for your time!",
             "phase": current_phase,

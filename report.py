@@ -62,6 +62,7 @@ def evaluate_interview_transcript(interview_data: dict):
                     "- Score the answer from 1 to 10 with justification\n\n"
                     "Return a JSON object with the following fields:\n"
                     "`relevant`, `skills_covered`, `missing_elements`, `score`, `feedback`"
+                    "Add final verdict as 'pass' or 'fail' based on the score.\n\n at the end of the JSON, include a 'raw_output' field with the original answer.\n\n"
                 )
             )
 

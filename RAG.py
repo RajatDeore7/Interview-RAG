@@ -226,7 +226,7 @@ def chat_with_interviewer(
         3. Probe for problem-solving process, reasoning, and trade-offs—not just definitions.  
         4. If the candidate’s answer is vague, follow up with a request for concrete examples or code-level explanation.  
         5. Avoid behavioral or resume-only questions in this phase.
-        6. Ask one or two DSA and OOPs related question based on the required skills.
+        6. Ask one or two DSA questions topics like [Array, String, Linked List, Stack, Queue & Deque, Hashing (HashMap / HashSet),Recursion & Backtracking, Searching & Sorting, Tree (Binary Tree, BST), Graph, Heap / Priority Queue, Greedy Algorithms, Dynamic Programming (DP)].
         """
     else:
         phase_instruction = """

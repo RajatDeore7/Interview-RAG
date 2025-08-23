@@ -159,7 +159,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -226,7 +226,7 @@ def chat_with_interviewer(
         3. Probe for problem-solving process, reasoning, and trade-offs—not just definitions.  
         4. If the candidate’s answer is vague, follow up with a request for concrete examples or code-level explanation.  
         5. Avoid behavioral or resume-only questions in this phase.
-        6. Ask required skills based questions.
+        6. Ask one or two DSA and OOPs related question based on the required skills.
         """
     else:
         phase_instruction = """
@@ -285,7 +285,7 @@ def chat_with_interviewer(
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )

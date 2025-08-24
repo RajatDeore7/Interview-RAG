@@ -4,7 +4,7 @@ import shutil
 import logging
 import boto3
 import json
-from datetime import datetime
+from typing import Optional
 from fastapi import FastAPI, HTTPException, Header, Depends, UploadFile, File
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -224,7 +224,11 @@ async def chat_with_bot(
 
 
 @app.post("/evaluateInterview")
-async def evaluate_interview(job: JobContext, user_id: str = Depends(check_user)):
+async def evaluate_interview(
+    job: JobContext, 
+    user_id: str = Depends(check_user),
+    interview_date: Optional[str] = Header(None, alias="interview-date"), 
+):
     company = normalize_string(job.company)
     role = normalize_string(job.role_title)
 
@@ -235,11 +239,20 @@ async def evaluate_interview(job: JobContext, user_id: str = Depends(check_user)
     if "Contents" not in response or not response["Contents"]:
         return {"error": "No interview data found for this job context."}
 
-    latest_file = sorted(
-        response["Contents"], key=lambda x: x["LastModified"], reverse=True
-    )[0]["Key"]
+    # If date provided, filter filenames
+    files = [obj["Key"] for obj in response["Contents"]]
+    if interview_date:
+        files = [f for f in files if f.startswith(f"{prefix}{interview_date}")]
+        if not files:
+            return {"error": f"No file found for date {interview_date}"}
+        selected_file = sorted(files, reverse=True)[0]  # pick latest on that date
+    else:
+        # fallback to latest
+        selected_file = sorted(
+            response["Contents"], key=lambda x: x["LastModified"], reverse=True
+        )[0]["Key"]
 
-    obj = s3.get_object(Bucket=bucket_name, Key=latest_file)
+    obj = s3.get_object(Bucket=bucket_name, Key=selected_file)
     interview_data = json.loads(obj["Body"].read().decode("utf-8"))
 
     report = evaluate_interview_transcript(interview_data)
@@ -251,7 +264,8 @@ async def evaluate_interview(job: JobContext, user_id: str = Depends(check_user)
             "job_role": job.role_title,
             "company": job.company,
             "interview_time": interview_data.get("timestamp", "unknown"),
+            "file": selected_file,
         },
         "report": report,
-        # "interview_data": interview_data,
     }
+

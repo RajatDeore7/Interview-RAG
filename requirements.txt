@@ -6,6 +6,7 @@ pydantic
 python-dotenv
 boto3
 datetime
+typing
 
 # LangChain & LLMs
 langchain

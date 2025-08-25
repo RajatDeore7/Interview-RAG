@@ -45,7 +45,7 @@ class InterviewManager:
             self.phase = "closed"
 
     def is_interview_over(self):
-        return self.get_elapsed_minutes() > self.total_time
+        return self.get_elapsed_minutes() >= (self.total_time - 0.0333)
 
     def get_current_phase(self):
         self.update_phase()

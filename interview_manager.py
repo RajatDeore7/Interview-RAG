@@ -12,7 +12,7 @@ class InterviewManager:
             "resume": 0.25,
             "role based technical": 0.45,
             "behavioral": 0.20,
-            "wrapup": 0.09
+            "wrapup": 0.10,
         }
 
         # Compute cutoffs based on ratios

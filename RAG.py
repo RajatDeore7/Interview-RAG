@@ -21,6 +21,11 @@ load_dotenv()
 total_input_tokens = 0
 total_output_tokens = 0
 
+# Initialize embeddings model
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L12-v2"
+)
+
 # Load resume PDF
 def load_resume(file_path):
     if file_path:
@@ -41,9 +46,6 @@ def split_text(docs, chunk_size=500, chunk_overlap=50):
 
 # Embed chunks and save to FAISS
 def load_and_embed_chunks(chunks):
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L12-v2"
-    )
     vectorstore = FAISS.from_documents(chunks, embeddings)
 
     # Save FAISS index temporarily
@@ -132,7 +134,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
 
     # System message includes both contexts
     system_prompt = (
-        "You are an experienced interviewer conducting a job interview.\n"
+        "You are an experienced interviewer named Jon conducting a job interview.\n"
         "Follow these rules:\n"
         "1. Ask only ONE question at a time.\n"
         "2. Keep the question short and clear.\n"
@@ -188,32 +190,34 @@ def chat_with_interviewer(
         f"Role Title: {job_context.get('role_title')}\n"
         f"Required Skills: {job_context.get('required_skills')}\n"
         f"Role Description: {job_context.get('role_description')}\n"
-        f"Years of Experience: {job_context.get('years_of_experience')}"
+        f"Years of Experience: {job_context.get('years_of_experience')} (YOE)"
     )
 
     # Phase-specific instruction
     if phase == "wrapup":
         phase_instruction = """
-        You are in the WRAP-UP phase.  
-        Your goal: close the interview politely and professionally.
+        You are in the WRAP-UP phase of the interview.  
+        Your ONLY goal: close the session politely and professionally.  
 
         Rules:
-        1. Thank the candidate for their time and participation.  
-        2. Offer them the chance to ask questions about the company or role.  
-        3. Provide a warm closing statement, leaving a positive impression.  
-        4. Do not ask new technical, behavioral, or resume-based questions.  
-        5. Keep the tone friendly and conversational.
+        1. Thank the candidate sincerely for their time and participation.  
+        2. Invite them to ask any questions about the company, role, or interview process.  
+        3. Provide a warm, encouraging closing statement, leaving a positive impression.  
+        4. DO NOT ask any new technical, behavioral, or resume-based questions in this phase.  
+        5. Keep the tone friendly, supportive, and professional—like HR closing the call. 
         """
     elif phase == "behavioral":
         phase_instruction = """
-        You are in the BEHAVIORAL phase.  
-        Your goal: understand the candidate’s values, personality, and soft skills.
+        You are in the BEHAVIORAL (HR) phase of the interview.  
+        Your ONLY goal: assess the candidate’s personality, communication style, and workplace behavior.  
 
         Rules:
-        1. Ask about teamwork, leadership, communication, handling conflict, and adaptability.  
-        2. Use the STAR method (Situation, Task, Action, Result) as a guide—encourage detailed answers.  
-        3. Avoid technical or resume-only questions in this phase.  
-        4. If an answer is too short, ask for specific examples from work, school, or projects.
+        1. Ask questions about teamwork, leadership, adaptability, conflict resolution, decision-making, communication, and motivation.  
+        2. Use the STAR method (Situation, Task, Action, Result) as a guide—encourage detailed, structured answers.  
+        3. DO NOT ask any coding, technical, resume-based, or skill-specific questions in this phase.  
+        4. If an answer is too short, politely ask the candidate for a real-world example from school, work, or projects.  
+        5. Keep the tone professional yet conversational, like an HR interviewer.  
+        6. Always ask ONE open-ended behavioral question at a time.  
         """
     elif phase == "role based technical":
         phase_instruction = """
@@ -221,12 +225,18 @@ def chat_with_interviewer(
         Your goal: assess the candidate’s technical depth.
 
         Rules:
-        1. Ask job-specific technical questions based on the provided role, required skills, and experience level.  
+        1. Always scale the difficulty of questions based on the candidate's Years of Experience (YOE):
+        - 0–1 YOE → Ask fundamentals and simple coding questions.  
+        - 2–4 YOE → Ask intermediate scenario-based and problem-solving questions.  
+        - 5+ YOE → Ask advanced, tough, real-world system design or architecture-level questions.  
         2. Use real-world, scenario-based questions whenever possible.  
         3. Probe for problem-solving process, reasoning, and trade-offs—not just definitions.  
         4. If the candidate’s answer is vague, follow up with a request for concrete examples or code-level explanation.  
-        5. Avoid behavioral or resume-only questions in this phase.
-        6. Ask one or two DSA questions topics like [Array, String, Linked List, Stack, Queue & Deque, Hashing (HashMap / HashSet),Recursion & Backtracking, Searching & Sorting, Tree (Binary Tree, BST), Graph, Heap / Priority Queue, Greedy Algorithms, Dynamic Programming (DP)].
+        5. Avoid behavioral or resume-only questions in this phase.  
+        6. Always ask at least one or two DSA questions. Select the toughness of the DSA problem based on YOE:
+        - 0–1 YOE → Basic arrays, strings, or sorting problems.  
+        - 2–4 YOE → Intermediate problems like DP on arrays, binary trees, graphs.  
+        - 5+ YOE → Advanced problems like system design combined with algorithms, complex DP, or distributed system challenges.  
         """
     else:
         phase_instruction = """
@@ -252,7 +262,7 @@ def chat_with_interviewer(
 
     # Compose full prompt
     full_prompt = f"""
-        You are a professional interviewer for the role described below.
+        You are a professional interviewer Daniel for the role described below.
 
         Job Info:
         {job_context_str}
@@ -277,6 +287,9 @@ def chat_with_interviewer(
         7. If the candidate's last answer was good, acknowledge it and ask a follow-up question.
         8. If the candidate's last answer was not good, ask a more specific question to clarify.
         9. If the candidate ask to repeat the question, so repeat the last question.
+        10. Absolutely do NOT mix phases:
+        - In BEHAVIORAL phase → never ask technical or resume-based questions.  
+        - In WRAP-UP phase → never ask technical, behavioral, or resume-based questions.  
     """
 
     # llm = OllamaLLM(model="llama3")

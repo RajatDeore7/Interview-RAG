@@ -202,7 +202,7 @@ async def chat_with_bot(
         )
         USER_HISTORY[user_id] = history
         return {
-            "interviewer": "Interview is over. Thank you for your time!",
+            "interviewer": "I think we've covered everything. Thank you for your time! Have a great day!",
             "phase": "closed",
             "remaining_credits": USER_CREDITS[user_id],
         }

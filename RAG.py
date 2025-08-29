@@ -233,7 +233,7 @@ def chat_with_interviewer(
         3. Probe for problem-solving process, reasoning, and trade-offs—not just definitions.  
         4. If the candidate’s answer is vague, follow up with a request for concrete examples or code-level explanation.  
         5. Avoid behavioral or resume-only questions in this phase.  
-        6. Always ask at least one or two DSA questions. Select the toughness of the DSA problem based on YOE:
+        6. Always ask at least one or two DSA questions. Select the toughness of the DSA problem based on YOE don't ask to write code just ask the question:
         - 0–1 YOE → Basic arrays, strings, or sorting problems.  
         - 2–4 YOE → Intermediate problems like DP on arrays, binary trees, graphs.  
         - 5+ YOE → Advanced problems like system design combined with algorithms, complex DP, or distributed system challenges.  
@@ -259,16 +259,18 @@ def chat_with_interviewer(
     conversation = ""
     for msg in history:
         conversation += f"{msg['role'].capitalize()}: {msg['content']}\n"
+        
+    # Phase-specific context injection
+    if phase == "resume":
+        context_section = f"Relevant Resume Info:\n{resume_reference}"
+    else:
+        context_section = f"Job Info:\n{job_context_str}"
 
     # Compose full prompt
     full_prompt = f"""
         You are a professional interviewer Daniel for the role described below.
 
-        Job Info:
-        {job_context_str}
-
-        Relevant Resume Info:
-        {resume_reference}
+        {context_section}
 
         Interview Phase Instructions:
         {phase_instruction}

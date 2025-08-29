@@ -260,6 +260,13 @@ def chat_with_interviewer(
     for msg in history:
         conversation += f"{msg['role'].capitalize()}: {msg['content']}\n"
         
+    # Keep only previous 2 conversations to limit token usage
+    conversation_lines = conversation.strip().split("\n")
+    if len(conversation_lines) > 6:  # Each message has 2 lines
+        conversation = "\n".join(conversation_lines[-6:])
+    else:
+        conversation = "\n".join(conversation_lines)
+        
     # Phase-specific context injection
     if phase == "resume":
         context_section = f"Relevant Resume Info:\n{resume_reference}"

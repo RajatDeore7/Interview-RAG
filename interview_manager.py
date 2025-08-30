@@ -1,5 +1,7 @@
+import logging
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
 
 class InterviewManager:
     def __init__(self, interview_timing: int):
@@ -43,6 +45,9 @@ class InterviewManager:
             self.phase = "wrapup"
         else:
             self.phase = "closed"
+            
+        # 🔹 Log phase + remaining time
+        logger.info(f"Phase: {self.phase} | Remaining: {self.get_remaining_minutes():.2f} min")
 
     def is_interview_over(self):
         return self.get_elapsed_minutes() >= self.total_time

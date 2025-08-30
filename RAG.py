@@ -134,7 +134,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
 
     # System message includes both contexts
     system_prompt = (
-        "You are an experienced interviewer named Jon conducting a job interview.\n"
+        "You are an experienced interviewer named Daniel conducting a job interview.\n"
         "Follow these rules:\n"
         "1. Ask only ONE question at a time.\n"
         "2. Keep the question short and clear.\n"
@@ -161,7 +161,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -275,7 +275,7 @@ def chat_with_interviewer(
 
     # Compose full prompt
     full_prompt = f"""
-        You are a professional interviewer Daniel for the role described below.
+        You are a professional interviewer for the role described below.
 
         {context_section}
 
@@ -307,7 +307,7 @@ def chat_with_interviewer(
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )

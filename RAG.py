@@ -343,6 +343,6 @@ def chat_with_interviewer(
             "total_tokens": total_tokens
         }
         print(f"Storing interview data for user {userid} to S3...")
-        store_interview_to_s3(userid, interview_data)
+        store_interview_to_s3(userid, interview_data, allow_wrapup_check=True)
 
     return ai_reply, history

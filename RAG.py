@@ -333,7 +333,7 @@ def chat_with_interviewer(
     history.append({"role": "assistant", "content": ai_reply})
 
     # Store interview data to S3 after phase wrap-up
-    if phase == "closed":
+    if phase == "wrapup":
         interview_data = {
             "job_context": job_context,
             "conversation_history": history,

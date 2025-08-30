@@ -35,28 +35,44 @@ def serialize_chat_history(data):
     return serialized
 
 
-def store_interview_to_s3(user_id, interview_data):
+def store_interview_to_s3(user_id, interview_data, allow_wrapup_check=True):
     # Serialize conversation history
     if "conversation_history" in interview_data:
         interview_data["conversation_history"] = serialize_chat_history(
             interview_data["conversation_history"]
         )
 
-    # Add timestamp
-    timestamp = datetime.utcnow().isoformat()
-    interview_data["timestamp"] = timestamp
-
     # Extract job info
     job_context = interview_data.get("job_context", {})
     company = normalize_string(job_context.get("company", "unknown_company"))
     role = normalize_string(job_context.get("role_title", "unknown_role"))
 
-    # Optional: Add UUID or run id for duplicates
-    run_id = str(uuid.uuid4())[:8]
+    prefix = f"interviews/{user_id}/{company}/{role}/"
 
-    # Filename & path
+    # 🛑 Wrap-up protection: check if file already exists within last 5 mins
+    if allow_wrapup_check:
+        try:
+            resp = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+            if "Contents" in resp:
+                # Get most recent file
+                latest = max(resp["Contents"], key=lambda x: x["LastModified"])
+                last_modified = latest["LastModified"].replace(tzinfo=None)
+                age_seconds = (datetime.utcnow() - last_modified).total_seconds()
+
+                if age_seconds < 300:  # 5 minutes
+                    print(f"⚠️ Skipping save: Recent file exists ({age_seconds:.0f}s ago)")
+                    return
+        except Exception as e:
+            print(f"⚠️ Could not check recent saves: {e}")
+
+    # Add timestamp
+    timestamp = datetime.utcnow().isoformat()
+    interview_data["timestamp"] = timestamp
+
+    # Add UUID to avoid overwrites
+    run_id = str(uuid.uuid4())[:8]
     filename = f"{timestamp.replace(':', '-')}_{run_id}.json"
-    s3_key = f"interviews/{user_id}/{company}/{role}/{filename}"
+    s3_key = f"{prefix}{filename}"
 
     # Upload
     s3.put_object(

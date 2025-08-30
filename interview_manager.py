@@ -32,6 +32,10 @@ class InterviewManager:
 
     def get_elapsed_minutes(self):
         return (datetime.now() - self.start_time).seconds / 60.0
+    
+    def get_remaining_minutes(self):
+        remaining = self.total_time - self.get_elapsed_minutes()
+        return max(0, remaining)
 
     def update_phase(self):
         minutes = self.get_elapsed_minutes()

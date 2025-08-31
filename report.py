@@ -28,7 +28,7 @@ def evaluate_interview_transcript(interview_data: dict):
 
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.3,
         max_tokens=1000,
     )

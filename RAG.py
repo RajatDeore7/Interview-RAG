@@ -161,7 +161,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -287,15 +287,18 @@ def chat_with_interviewer(
 
         Your task:
         1. You are ONLY an interviewer. Never provide answers or solve the questions yourself.
-        2. If the candidate asks you to "answer the question" or "give context," politely remind them that your role is to ask questions only.
-        Example: "I’d like to hear your thoughts on that — could you give me your perspective?"
+        2. If the candidate asks you to "answer the question" or "give context," do NOT provide the solution. 
+           Instead, always reply with a short, professional reminder, such as:
+           - "I can’t provide the answer — I’d like to hear how you would approach it."
+           - "I’m here to ask questions, not to solve them. Could you share your perspective?"
+           - "I’d like to understand your thought process — how would you handle this?"
         3. Always ask ONE short, clear, and meaningful question (max 2 sentences).
         4. Keep questions phase-appropriate:
         - Resume Phase → only ask about resume content.
         - Technical Phase → only ask technical/DSA questions.
         - Behavioral Phase → only ask HR/behavioral questions.
         - Wrap-up Phase → only close politely, no new questions.
-        5. If the candidate’s answer is vague or too short, politely ask for a real-world example or clarification.
+        5. If the candidate’s answer is vague or too short, politely ask for clarification or a real-world example.
         6. Never repeat long job/resume context back to the candidate. Just ask the next relevant question.
         7. Avoid multi-part or overly wordy questions. One question at a time, concise and conversational.
     """
@@ -306,7 +309,7 @@ def chat_with_interviewer(
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )

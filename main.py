@@ -61,19 +61,17 @@ app.add_middleware(
 def check_user(
     api_key: str = Header(..., alias="api-key"),
     user_id: str = Header(..., alias="user-id"),
-    user_credits: int = Header(None, alias="user-credits"),  # DB-provided value
+    user_credits: Optional[int] = Header(None, alias="user-credits"),
 ):
     if api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Invalid API Key")
 
-    # Initialize credits if new user
-    if user_id not in USER_CREDITS:
-        if user_credits is None:
-            raise HTTPException(
-                status_code=400, detail="Missing user credits for new user."
-            )
+    # Always update from DB if provided
+    if user_credits is not None:
         USER_CREDITS[user_id] = user_credits
-        logger.info(f"Initialized credits for {user_id}: {user_credits}")
+        logger.info(f"Synced credits for {user_id}: {user_credits}")
+    elif user_id not in USER_CREDITS:
+        raise HTTPException(status_code=400, detail="Missing user credits for new user.")
 
     return user_id
 

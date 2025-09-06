@@ -2,7 +2,11 @@ import json
 import re
 from langchain_groq import ChatGroq
 from langchain.schema import AIMessage, HumanMessage
+import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
 
+load_dotenv()
 
 def clean_content(raw: str) -> str:
     # Extract content='...' or "..." using regex
@@ -25,13 +29,17 @@ def evaluate_interview_transcript(interview_data: dict):
     years_of_experience = job_context.get("years_of_experience")
 
     evaluation_results = []
-
-    llm = ChatGroq(
-        model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
-        temperature=0.3,
-        max_tokens=1000,
+    
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-pro", google_api_key=os.getenv("GEMINI_KEY"), temperature=0.7
     )
+
+    # llm = ChatGroq(
+    #     model="meta-llama/llama-4-scout-17b-16e-instruct",
+    #     api_key="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",
+    #     temperature=0.3,
+    #     max_tokens=1000,
+    # )
 
     current_question = None
 

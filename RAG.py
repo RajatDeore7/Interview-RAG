@@ -156,15 +156,15 @@ def initialize_interview(vstore, job_context: dict, history=None):
     full_prompt = f"{system_prompt}\n\n{user_prompt}"
 
     # llm = OllamaLLM(model="llama3")
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-pro", google_api_key=os.getenv("GEMINI_KEY"), temperature=0.7
-    )
-    # llm = ChatGroq(
-    #     model="meta-llama/llama-4-scout-17b-16e-instruct",
-    #     api_key="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",
-    #     temperature=0.7,
-    #     max_tokens=1000,
+    # llm = ChatGoogleGenerativeAI(
+    #     model="gemini-2.5-pro", google_api_key=os.getenv("GEMINI_KEY"), temperature=0.7
     # )
+    llm = ChatGroq(
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        api_key="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",
+        temperature=0.7,
+        max_tokens=1000,
+    )
     ai_reply = llm.invoke(full_prompt)
 
     history.append({"role": "system", "content": system_prompt})
@@ -304,15 +304,15 @@ def chat_with_interviewer(
     """
 
     # llm = OllamaLLM(model="llama3")
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-pro", google_api_key=os.getenv("GEMINI_KEY"), temperature=0.7
-    )
-    # llm = ChatGroq(
-    #     model="meta-llama/llama-4-scout-17b-16e-instruct",
-    #     api_key="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",
-    #     temperature=0.7,
-    #     max_tokens=1000,
+    # llm = ChatGoogleGenerativeAI(
+    #     model="gemini-2.5-pro", google_api_key=os.getenv("GEMINI_KEY"), temperature=0.7
     # )
+    llm = ChatGroq(
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        api_key="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",
+        temperature=0.7,
+        max_tokens=1000,
+    )
     ai_reply = llm.invoke(full_prompt)
     # print(f"AI Reply: {ai_reply}")
     

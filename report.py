@@ -30,16 +30,16 @@ def evaluate_interview_transcript(interview_data: dict):
 
     evaluation_results = []
     
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-pro", google_api_key=os.getenv("GEMINI_KEY"), temperature=0.7
-    )
-
-    # llm = ChatGroq(
-    #     model="meta-llama/llama-4-scout-17b-16e-instruct",
-    #     api_key="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",
-    #     temperature=0.3,
-    #     max_tokens=1000,
+    # llm = ChatGoogleGenerativeAI(
+    #     model="gemini-2.5-pro", google_api_key=os.getenv("GEMINI_KEY"), temperature=0.7
     # )
+
+    llm = ChatGroq(
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        api_key="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",
+        temperature=0.3,
+        max_tokens=1000,
+    )
 
     current_question = None
 

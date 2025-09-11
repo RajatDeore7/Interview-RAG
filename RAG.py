@@ -161,7 +161,7 @@ def initialize_interview(vstore, job_context: dict, history=None):
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
@@ -309,7 +309,7 @@ def chat_with_interviewer(
     # )
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",
-        api_key="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",
+        api_key="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",
         temperature=0.7,
         max_tokens=1000,
     )
